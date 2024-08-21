@@ -37,7 +37,7 @@ export default function Sidebar() {
           className={`w-60 mx-5 mb-4 flex items-center justify-center gap-2 ${
             isActive("/costumers")
               ? "bg-[#0A1D27] text-white"
-              : "bg-transparent text-[#0A1D27] border border-[#0A1D27]"
+              : "bg-transparent text-[#0A1D27] border border-[#0A1D27] hover:bg-[#0A1D27] hover:text-white transition"
           } transition`}
         >
           <Users className="w-5 h-5" />
@@ -49,7 +49,7 @@ export default function Sidebar() {
           className={`w-60 mx-5 mb-4 flex items-center justify-center gap-2 ${
             isActive("/contacts")
               ? "bg-[#0A1D27] text-white"
-              : "bg-transparent text-[#0A1D27] border border-[#0A1D27]"
+              : "bg-transparent text-[#0A1D27] border border-[#0A1D27] hover:bg-[#0A1D27] hover:text-white transition"
           } transition`}
         >
           <Phone className="w-5 h-5" />
