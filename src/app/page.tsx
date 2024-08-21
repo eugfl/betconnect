@@ -1,7 +1,9 @@
+import FormLogin from "@/components/loginForm";
+
 export default function Home() {
   return (
     <>
-      <h1>BetConnect</h1>
+      <FormLogin />
     </>
   );
 }

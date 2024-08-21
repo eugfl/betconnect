@@ -1,11 +1,16 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "./prisma";
 import Credentials from "next-auth/providers/credentials";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+interface UserWithPassword {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
@@ -13,30 +18,47 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize({ email, password }) {
-        if (!email || !password) return null;
+        if (!email || !password) {
+          throw new Error("E-mail e senha são obrigatórios.");
+        }
 
-        const user = await prisma.user.findUnique({
+        const user = (await prisma.user.findUnique({
           where: { email: email as string },
-        });
+        })) as UserWithPassword | null;
 
-        if (!user || !user.password) return null;
+        if (!user) {
+          throw new Error("Usuário não encontrado.");
+        }
 
-        const isPasswordValid = await bcrypt.compare(
+        const isValidPassword = await bcrypt.compare(
           password as string,
           user.password
         );
 
-        if (!isPasswordValid) return null;
+        if (!isValidPassword) {
+          throw new Error("Credenciais inválidas.");
+        }
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        };
+        return user;
       },
     }),
   ],
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+      }
+      return session;
+    },
+  },
+  secret: process.env.AUTH_SECRET,
 });
