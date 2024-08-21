@@ -17,6 +17,7 @@ model User {
   accounts      Account[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  resetTokens   ResetPasswordToken[] // Adicione esta linha
 }
 
 model Account {
@@ -64,4 +65,14 @@ model Contact {
   phone      String
   customerId String
   customer   Customer @relation("CustomerContacts", fields: [customerId], references: [id])
+}
+
+model ResetPasswordToken {
+  token      String   @id
+  userId     String
+  expiresAt  DateTime
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
