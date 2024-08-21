@@ -98,7 +98,7 @@ export default function Login() {
           Não possui conta?
           <Link href="/register"> Criar conta</Link>
         </p>
-        <Link href="/recovery-password" className="text-sm">
+        <Link href="/request-reset-password" className="text-sm">
           Esqueci minha senha
         </Link>
       </form>
