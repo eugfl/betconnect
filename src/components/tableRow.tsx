@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Edit, Trash } from "lucide-react";
-import Link from "next/link";
 
 interface TableRowProps {
   id: string;
@@ -12,6 +11,7 @@ interface TableRowProps {
   dataRegistro: string;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onViewContacts: (id: string) => void;
 }
 
 export default function TableRow({
@@ -22,6 +22,7 @@ export default function TableRow({
   dataRegistro,
   onEdit,
   onDelete,
+  onViewContacts,
 }: TableRowProps) {
   return (
     <tr>
@@ -44,12 +45,12 @@ export default function TableRow({
         </button>
       </td>
       <td>
-        <Link
-          href={""}
+        <button
+          onClick={() => onViewContacts(id)}
           className="px-6 py-4 whitespace-nowrap text-blue-500 hover:text-blue-700"
         >
           Ver contatos
-        </Link>
+        </button>
       </td>
     </tr>
   );

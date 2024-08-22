@@ -10,6 +10,7 @@ import TableRow from "@/components/tableRow";
 import { useState, useEffect } from "react";
 import CreateClienteModal from "@/components/createClientModal";
 import EditClienteModal from "@/components/editClientModal";
+import ContactsModal from "@/components/contactsModal";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -18,17 +19,19 @@ export default function Page() {
   const [clientes, setClientes] = useState<any[]>([]);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isViewContactsModalOpen, setViewContactsModalOpen] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState<any>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
+    null
+  );
 
   async function fetchClientes() {
     try {
       const response = await fetch("/api/costumers");
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Erro ao buscar clientes");
       }
-
       const data = await response.json();
       setClientes(data);
     } catch (error) {
@@ -53,12 +56,10 @@ export default function Page() {
       const response = await fetch(`/api/costumers/${id}`, {
         method: "DELETE",
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Erro ao excluir cliente");
       }
-
       setClientes((prev) => prev.filter((c) => c.id !== id));
       toast.success("Cliente excluído com sucesso.");
     } catch (error) {
@@ -70,6 +71,11 @@ export default function Page() {
     setCreateModalOpen(false);
     setEditModalOpen(false);
     fetchClientes();
+  };
+
+  const handleViewContacts = (id: string) => {
+    setSelectedCustomerId(id);
+    setViewContactsModalOpen(true);
   };
 
   if (!session) {
@@ -141,6 +147,7 @@ export default function Page() {
                       dataRegistro={formattedRegistrationDate}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
+                      onViewContacts={handleViewContacts}
                     />
                   );
                 })}
@@ -167,6 +174,12 @@ export default function Page() {
             onSave={handleSaveCliente}
           />
         )}
+
+        <ContactsModal
+          isOpen={isViewContactsModalOpen}
+          onClose={() => setViewContactsModalOpen(false)}
+          customerId={selectedCustomerId || ""}
+        />
       </div>
     </div>
   );
