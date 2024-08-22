@@ -10,40 +10,22 @@ export async function PATCH(
   const updateData: any = {};
 
   if (fullName) updateData.fullName = fullName;
-  if (email) {
-    const existingCustomer = await prisma.customer.findFirst({
-      where: {
-        email,
-        id: {
-          not: id,
-        },
-      },
-    });
-
-    if (existingCustomer) {
-      return NextResponse.json(
-        { error: "Este email já está em uso." },
-        { status: 400 }
-      );
-    }
-
-    updateData.email = email;
-  }
+  if (email) updateData.email = email;
   if (phone) updateData.phone = phone;
 
   try {
-    const cliente = await prisma.customer.update({
+    const contact = await prisma.contact.update({
       where: { id: String(id) },
       data: updateData,
     });
 
-    return NextResponse.json(cliente);
+    return NextResponse.json(contact);
   } catch (error) {
-    console.error("Erro ao atualizar cliente:", error);
+    console.error("Erro ao atualizar contato:", error);
     return NextResponse.json(
       {
         error:
-          "Ocorreu um erro ao atualizar o cliente. Tente novamente mais tarde.",
+          "Ocorreu um erro ao atualizar o contato. Tente novamente mais tarde.",
       },
       { status: 500 }
     );
@@ -56,30 +38,26 @@ export async function DELETE(req: NextRequest) {
 
   if (!id) {
     return NextResponse.json(
-      { error: "ID do cliente não fornecido." },
+      { error: "ID do contato não fornecido." },
       { status: 400 }
     );
   }
 
   try {
-    await prisma.contact.deleteMany({
-      where: { customerId: id },
-    });
-
-    await prisma.customer.delete({
+    await prisma.contact.delete({
       where: { id: String(id) },
     });
 
     return NextResponse.json(
-      { message: "Cliente e seus contatos excluídos com sucesso." },
+      { message: "Contato excluído com sucesso." },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Erro ao excluir cliente e contatos:", error);
+    console.error("Erro ao excluir contato:", error);
     return NextResponse.json(
       {
         error:
-          "Ocorreu um erro ao excluir o cliente e seus contatos. Tente novamente mais tarde.",
+          "Ocorreu um erro ao excluir o contato. Tente novamente mais tarde.",
       },
       { status: 500 }
     );
