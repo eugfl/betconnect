@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 
@@ -23,13 +23,9 @@ const ContactsModal: React.FC<ContactsModalProps> = ({
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen && customerId) {
-      fetchContacts();
-    }
-  }, [isOpen, customerId]);
+  const fetchContacts = useCallback(async () => {
+    if (!customerId) return;
 
-  const fetchContacts = async () => {
     try {
       const response = await fetch(`/api/contacts?customerId=${customerId}`);
       if (!response.ok) {
@@ -42,7 +38,13 @@ const ContactsModal: React.FC<ContactsModalProps> = ({
       setError("Erro ao buscar contatos.");
       toast.error("Erro ao buscar contatos.");
     }
-  };
+  }, [customerId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchContacts();
+    }
+  }, [isOpen, fetchContacts]);
 
   if (!isOpen) return null;
 
